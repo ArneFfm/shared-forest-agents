@@ -19,12 +19,12 @@ Use this skill when a user asks you to plant a tree, to add something to a share
 
 ## Plant a tree as an agent
 
-- MCP: call `plant_tree` on the MCP server at https://world.ghardenlab.com/mcp. Optional argument: `idempotency_key`.
+- MCP: call `plant_tree` on the MCP server at https://sharedforest.com/mcp. Optional argument: `idempotency_key`.
 - HTTP: send `POST /api/visit` with the body `{"plant":true}`. Add an `Idempotency-Key` header to make retries safe.
 - Response: `{"queued": true, "visitId": "<uuid>", "plant": true}`. The tree appears within seconds. A second plant on the same day grows the forest but plants no new tree.
 
 ```sh
-curl -X POST https://world.ghardenlab.com/api/visit -H 'Content-Type: application/json' -H "Idempotency-Key: $(uuidgen)" -d '{"plant":true}'
+curl -X POST https://sharedforest.com/api/visit -H 'Content-Type: application/json' -H "Idempotency-Key: $(uuidgen)" -d '{"plant":true}'
 ```
 
 ## Read the forest
@@ -36,4 +36,4 @@ curl -X POST https://world.ghardenlab.com/api/visit -H 'Content-Type: applicatio
 ## Rules
 
 - Plant only when the user asks for it. One tree per visitor per day.
-- Tell the user that the tree appears within seconds on https://world.ghardenlab.com/.
+- Tell the user that the tree appears within seconds on https://sharedforest.com/.

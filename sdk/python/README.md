@@ -1,6 +1,6 @@
 # shared-forest
 
-Zero-dependency Python client for the [Shared Forest](https://world.ghardenlab.com/) API.
+Zero-dependency Python client for the [Shared Forest](https://sharedforest.com/) API.
 Standard library only (`urllib`). Python 3.9+.
 
 The package is not on PyPI yet. Install it from this repository:

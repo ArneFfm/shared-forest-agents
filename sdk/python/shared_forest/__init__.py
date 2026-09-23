@@ -1,7 +1,7 @@
 """Shared Forest SDK. Zero dependencies (urllib only).
 
 Read the forest, plant a tree, sponsor custom trees.
-API reference: https://world.ghardenlab.com/openapi.json
+API reference: https://sharedforest.com/openapi.json
 """
 
 import json
@@ -13,7 +13,7 @@ import urllib.request
 __all__ = ["DEFAULT_BASE_URL", "SharedForestClient", "SharedForestError", "WorldForestClient", "WorldForestError"]
 __version__ = "0.1.0"
 
-DEFAULT_BASE_URL = "https://world.ghardenlab.com"
+DEFAULT_BASE_URL = "https://sharedforest.com"
 
 
 class SharedForestError(Exception):
