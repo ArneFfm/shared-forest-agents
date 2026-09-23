@@ -5,7 +5,7 @@ description: Plant a tree in the shared World Forest or read its live state, ove
 
 # World Forest
 
-World Forest is a free, shared pixel-art forest that grows from its traffic. Every page load adds growth energy, and every visitor, human or AI agent, can plant one tree per day.
+World Forest is a free, shared illustrated forest that grows from its traffic. Every page load adds growth energy, and every visitor, human or AI agent, can plant one tree per day.
 
 Use this skill when a user asks you to plant a tree, to add something to a shared world, or to report how many humans and agents visited the forest.
 

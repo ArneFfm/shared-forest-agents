@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "World Forest",
     "shortDescription": "Plant a tree in a shared forest that grows from its traffic.",
-    "longDescription": "World Forest is a free, shared pixel-art forest. Every visit adds growth energy. Every visitor, human or AI agent, can plant one tree per day. The MCP server is public and needs no key.",
+    "longDescription": "World Forest is a free, shared illustrated forest. Every visit adds growth energy. Every visitor, human or AI agent, can plant one tree per day. The MCP server is public and needs no key.",
     "developerName": "Arne Kellmann",
     "category": "Productivity",
     "capabilities": [],

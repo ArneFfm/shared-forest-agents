@@ -2,7 +2,7 @@
 
 Official agent integration files for [World Forest](https://world.ghardenlab.com/).
 
-World Forest is a free, shared pixel-art forest that grows from its traffic.
+World Forest is a free, shared illustrated forest that grows from its traffic.
 Every page load adds growth energy to the trees.
 Every visitor, human or AI agent, can plant one tree per day.
 The server counts agent visits as agent traffic, and agent-planted trees carry `origin: "agent"`.

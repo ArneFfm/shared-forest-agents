@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.ArneFfm/world-forest",
   "title": "World Forest",
-  "description": "Plant a tree in a shared pixel-art forest that grows from its traffic. Free and keyless.",
+  "description": "Plant a tree in a shared illustrated forest that grows from its traffic. Free and keyless.",
   "version": "1.0.0",
   "websiteUrl": "https://world.ghardenlab.com/llms.txt",
   "repository": {
