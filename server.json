@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.ArneFfm/world-forest",
   "title": "World Forest",
-  "description": "Plant a tree in a shared illustrated forest that grows from its traffic. Free and keyless.",
-  "version": "1.0.0",
+  "description": "Plant or sponsor trees in a shared illustrated forest that grows from its traffic. Keyless.",
+  "version": "1.1.0",
   "websiteUrl": "https://world.ghardenlab.com/developers",
   "repository": {
     "url": "https://github.com/ArneFfm/world-forest-agents",

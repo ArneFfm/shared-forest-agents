@@ -2,3 +2,7 @@
 .mcpregistry*
 mcp-publisher
 publisher.tar.gz
+node_modules/
+dist/
+__pycache__/
+*.egg-info/

@@ -1,0 +1,60 @@
+name: Publish Python SDK
+# Release-only. Publishes sdk/python as world-forest with PyPI trusted publishing (OIDC).
+# Setup: on pypi.org add a pending trusted publisher for project "world-forest",
+# this repository, this workflow file and the environment "pypi". No API token is used.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build and check without publishing
+        type: boolean
+        default: true
+permissions:
+  contents: read
+jobs:
+  build:
+    # Release tags for this package: sdk-py-v<version>, for example sdk-py-v0.1.0.
+    if: (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'sdk-py-v')) || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdk/python
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check that the tag matches pyproject.toml
+        if: github.event_name == 'release'
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: test "$RELEASE_TAG" = "sdk-py-v$(python -c 'import tomllib;print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')"
+      - run: python -m unittest discover -s tests
+      - name: Build and check distributions
+        run: |
+          python -m pip install build twine
+          python -m build --outdir ../../dist
+          python -m twine check ../../dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-distributions
+          path: dist/*
+          if-no-files-found: error
+  publish:
+    needs: build
+    if: github.event_name == 'release' || !inputs.dry_run
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-distributions
+          path: dist
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

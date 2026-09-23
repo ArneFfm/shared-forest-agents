@@ -32,6 +32,26 @@ jobs:
           fi
       - name: Check that the skill matches the live copy
         run: curl -sSf "$ORIGIN/.well-known/agent-skills/world-forest/SKILL.md" | diff -u - skills/world-forest/SKILL.md
+      - name: Check that the sponsor skill matches the live copy (skipped until the site serves it)
+        run: |
+          url="$ORIGIN/.well-known/agent-skills/world-forest-sponsor/SKILL.md"
+          status=$(curl -s -o live-sponsor.md -w '%{http_code}' "$url")
+          if [ "$status" = 404 ]; then
+            echo "::notice::$url is not live yet. Comparison skipped."
+            exit 0
+          fi
+          test "$status" = 200
+          diff -u live-sponsor.md skills/world-forest-sponsor/SKILL.md
+  sdk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Test the JavaScript SDK
+        working-directory: sdk/js
+        run: npm test
+      - name: Test the Python SDK
+        working-directory: sdk/python
+        run: python3 -m unittest discover -s tests
   mcp-handshake:
     runs-on: ubuntu-latest
     steps:

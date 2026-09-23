@@ -1,13 +1,14 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "world-forest",
-  "version": "1.0.0",
-  "description": "Plant a tree in the shared World Forest and read its live state.",
+  "version": "1.1.0",
+  "description": "Plant a tree in the shared World Forest, read its live state, or sponsor custom trees for a user.",
   "homepage": "https://world.ghardenlab.com/developers",
   "keywords": [
     "mcp",
     "forest",
-    "public-api"
+    "public-api",
+    "sponsorship"
   ],
   "repository": "https://github.com/ArneFfm/world-forest-agents"
 }

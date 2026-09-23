@@ -1,0 +1,47 @@
+name: Publish npm SDK
+# Release-only. Publishes sdk/js as world-forest-sdk with npm trusted publishing (OIDC).
+# Setup: on npmjs.com add a trusted publisher for this repository and this workflow file,
+# with the environment "npm". No NPM_TOKEN secret is used.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Validate without publishing
+        type: boolean
+        default: true
+permissions:
+  contents: read
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+jobs:
+  publish:
+    # Release tags for this package: sdk-js-v<version>, for example sdk-js-v0.1.0.
+    if: (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'sdk-js-v')) || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: sdk/js
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check that the tag matches package.json
+        if: github.event_name == 'release'
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: test "$RELEASE_TAG" = "sdk-js-v$(node -p 'require("./package.json").version')"
+      - run: npm test
+      - run: npm pack --dry-run
+      - name: Publish with npm trusted publishing
+        if: github.event_name == 'release' || !inputs.dry_run
+        run: npm publish --access public --provenance
