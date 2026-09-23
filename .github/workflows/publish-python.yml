@@ -1,6 +1,6 @@
 name: Publish Python SDK
-# Release-only. Publishes sdk/python as world-forest with PyPI trusted publishing (OIDC).
-# Setup: on pypi.org add a pending trusted publisher for project "world-forest",
+# Release-only. Publishes sdk/python as shared-forest with PyPI trusted publishing (OIDC).
+# Setup: on pypi.org add a pending trusted publisher for project "shared-forest",
 # this repository, this workflow file and the environment "pypi". No API token is used.
 on:
   release:

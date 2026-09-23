@@ -1,5 +1,5 @@
 name: Publish npm SDK
-# Release-only. Publishes sdk/js as world-forest-sdk with npm trusted publishing (OIDC).
+# Release-only. Publishes sdk/js as shared-forest-sdk with npm trusted publishing (OIDC).
 # Setup: on npmjs.com add a trusted publisher for this repository and this workflow file,
 # with the environment "npm". No NPM_TOKEN secret is used.
 on:

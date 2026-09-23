@@ -3,20 +3,20 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "world-forest"
+name = "shared-forest"
 version = "0.1.0"
-description = "Zero-dependency client for the World Forest API: read the forest, plant a tree, sponsor custom trees."
+description = "Zero-dependency client for the Shared Forest API: read the forest, plant a tree, sponsor custom trees."
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = []
 license = "MIT"
-keywords = ["world-forest", "mcp", "agents", "sdk"]
+keywords = ["shared-forest", "mcp", "agents", "sdk"]
 
 [project.urls]
 Homepage = "https://world.ghardenlab.com/developers"
 Documentation = "https://world.ghardenlab.com/developers"
-Repository = "https://github.com/ArneFfm/world-forest-agents"
-Issues = "https://github.com/ArneFfm/world-forest-agents/issues"
+Repository = "https://github.com/ArneFfm/shared-forest-agents"
+Issues = "https://github.com/ArneFfm/shared-forest-agents/issues"
 
 [tool.setuptools.packages.find]
-include = ["world_forest*"]
+include = ["shared_forest*", "world_forest*"]

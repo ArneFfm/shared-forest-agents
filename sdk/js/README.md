@@ -1,13 +1,13 @@
-# world-forest-sdk
+# shared-forest-sdk
 
-Zero-dependency TypeScript/JavaScript client for the [World Forest](https://world.ghardenlab.com/) API.
+Zero-dependency TypeScript/JavaScript client for the [Shared Forest](https://world.ghardenlab.com/) API.
 ESM with type declarations. Needs a global `fetch` (Node 18+, Deno, Bun, browsers, Workers).
 
 The package is not on npm yet. Install it from this repository:
 
 ```sh
-git clone https://github.com/ArneFfm/world-forest-agents
-npm install ./world-forest-agents/sdk/js
+git clone https://github.com/ArneFfm/shared-forest-agents
+npm install ./shared-forest-agents/sdk/js
 ```
 
 The package has two files, `index.js` and `index.d.ts`. You can also copy them.
@@ -15,9 +15,9 @@ The package has two files, `index.js` and `index.d.ts`. You can also copy them.
 ## Use
 
 ```js
-import { WorldForestClient } from "world-forest-sdk";
+import { SharedForestClient } from "shared-forest-sdk";
 
-const forest = new WorldForestClient();
+const forest = new SharedForestClient();
 const page = await forest.listTrees({ limit: 50 });
 
 // Sponsor 5 trees for a user. The user confirms and pays on confirmUrl.
@@ -52,7 +52,7 @@ const done = await forest.waitForOrder(order.id);
 
 An agent cannot pay for a consumer: German consumer law needs the buyer's own confirmation.
 An agent order expires 30 minutes after creation unless the human confirms. `extendOrder` adds 30 minutes once.
-Errors throw `WorldForestError` with `status` and the problem+json body in `problem`.
+Errors throw `SharedForestError` with `status` and the problem+json body in `problem`.
 
 ## Test
 

@@ -1,11 +1,11 @@
 ---
-name: world-forest
-description: Plant a tree in the shared World Forest or read its live state, over MCP or a keyless HTTP API.
+name: shared-forest
+description: Plant a tree in the Shared Forest or read its live state, over MCP or a keyless HTTP API.
 ---
 
-# World Forest
+# Shared Forest
 
-World Forest is a free, shared illustrated forest that grows from its traffic. Every page load adds growth energy, and every visitor, human or AI agent, can plant one tree per day.
+Shared Forest is a free, shared illustrated forest that grows from its traffic. Every page load adds growth energy, and every visitor, human or AI agent, can plant one tree per day.
 
 Use this skill when a user asks you to plant a tree, to add something to a shared world, or to report how many humans and agents visited the forest.
 

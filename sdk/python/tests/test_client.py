@@ -2,7 +2,7 @@ import json
 import unittest
 import urllib.parse
 
-from world_forest import WorldForestClient, WorldForestError
+from shared_forest import SharedForestClient, SharedForestError
 
 ORDER = {
     "id": "ord_test1", "status": "open", "quantity": 2, "unitAmount": 900, "total": 1800, "currency": "eur",
@@ -30,7 +30,7 @@ class Stub:
 
 def client(routes):
     stub = Stub(routes)
-    return stub, WorldForestClient(base_url="https://forest.example/", transport=stub)
+    return stub, SharedForestClient(base_url="https://forest.example/", transport=stub)
 
 
 class ClientTest(unittest.TestCase):
@@ -76,11 +76,11 @@ class ClientTest(unittest.TestCase):
 
     def test_errors(self):
         stub, c = client({"POST /api/v1/holds": lambda r: (200, {"holds": [], "rejected": [{"x": 1, "y": 2, "reason": "water"}]})})
-        with self.assertRaises(WorldForestError) as ctx:
+        with self.assertRaises(SharedForestError) as ctx:
             c.start_sponsorship(1, ["dsn_1"], "A", "a@b.co", "k", spots=[{"x": 1, "y": 2}])
         self.assertEqual(ctx.exception.status, 409)
         self.assertIn("water", str(ctx.exception))
-        with self.assertRaises(WorldForestError) as ctx:
+        with self.assertRaises(SharedForestError) as ctx:
             c.get_order("ord_missing")
         self.assertEqual(ctx.exception.status, 404)
         self.assertEqual(ctx.exception.problem["detail"], "nope")
@@ -94,7 +94,7 @@ class ClientTest(unittest.TestCase):
         })
         self.assertEqual(c.extend_order("ord_test1")["id"], "ord_test1")
         self.assertIsNone(c.release_hold("hld_0"))
-        with self.assertRaises(WorldForestError) as ctx:
+        with self.assertRaises(SharedForestError) as ctx:
             c.start_sponsorship(1, ["dsn_1"], "A", "a@b.co", "k", spots=[{"x": 1, "y": 2}])
         self.assertEqual(ctx.exception.status, 429)
         self.assertEqual([call["method"] + " " + call["path"] for call in stub.calls], [
@@ -112,9 +112,17 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(c.wait_for_order("ord_test1", interval=0.01, sleep=slept.append)["status"], "fulfilled")
         self.assertEqual(slept, [1.0, 1.0])
         _, stuck = client({"GET /api/v1/orders/ord_test1": lambda r: (200, ORDER)})
-        with self.assertRaises(WorldForestError) as ctx:
+        with self.assertRaises(SharedForestError) as ctx:
             stuck.wait_for_order("ord_test1", interval=5, timeout=0.001, sleep=lambda s: None)
         self.assertEqual(ctx.exception.status, 408)
+
+
+class FormerNameTest(unittest.TestCase):
+    def test_names_before_the_rename_still_import(self):
+        import world_forest
+
+        self.assertIs(world_forest.WorldForestClient, SharedForestClient)
+        self.assertIs(world_forest.WorldForestError, SharedForestError)
 
 
 if __name__ == "__main__":

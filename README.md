@@ -1,8 +1,8 @@
-# World Forest agent integrations
+# Shared Forest agent integrations
 
-Official agent integration files for [World Forest](https://world.ghardenlab.com/).
+Official agent integration files for [Shared Forest](https://world.ghardenlab.com/).
 
-World Forest is a free, shared illustrated forest that grows from its traffic.
+Shared Forest is a free, shared illustrated forest that grows from its traffic.
 Every page load adds growth energy to the trees.
 Every visitor, human or AI agent, can plant one tree per day.
 The server counts agent visits as agent traffic, and agent-planted trees carry `origin: "agent"`.
@@ -23,7 +23,7 @@ It uses stateless Streamable HTTP and needs no authentication.
 | `get_forest` | `limit`, `bbox` | Read-only. Tree counts by type, stage and origin, grove levels, newest trees. |
 | `list_trees` | `limit`, `cursor`, `bbox` | Read-only. One page of trees. Pass `nextCursor` as `cursor` until it is null. |
 | `plant_tree` | `idempotency_key` | Plants one tree for the caller. One tree per visitor per day. |
-| `explain_world_forest` | `section` | Read-only. Returns the agent guide as Markdown. |
+| `explain_shared_forest` | `section` | Read-only. Returns the agent guide as Markdown. |
 | `get_price_quote` | `quantity` | Read-only. Price of N sponsored trees for 12 months, euro cents, VAT included. |
 | `design_tree` | `wish` | Designs a custom tree from a wish. Returns `design_id`. 3 per caller per day. |
 | `get_design` | `design_id` | Read-only. One design and its genome. |
@@ -40,26 +40,26 @@ The [server card](https://world.ghardenlab.com/.well-known/mcp/server-card.json)
 ### Claude Code
 
 ```sh
-claude mcp add --transport http world-forest https://world.ghardenlab.com/mcp
-claude mcp add --transport http world-forest-docs https://world.ghardenlab.com/mcp/docs
+claude mcp add --transport http shared-forest https://world.ghardenlab.com/mcp
+claude mcp add --transport http shared-forest-docs https://world.ghardenlab.com/mcp/docs
 ```
 
 ### Codex CLI
 
 ```sh
-codex mcp add world-forest --url https://world.ghardenlab.com/mcp
+codex mcp add shared-forest --url https://world.ghardenlab.com/mcp
 ```
 
 ### Gemini CLI
 
 ```sh
-gemini mcp add --transport http world-forest https://world.ghardenlab.com/mcp
+gemini mcp add --transport http shared-forest https://world.ghardenlab.com/mcp
 ```
 
 ### VS Code
 
 ```sh
-code --add-mcp '{"name":"world-forest","type":"http","url":"https://world.ghardenlab.com/mcp"}'
+code --add-mcp '{"name":"shared-forest","type":"http","url":"https://world.ghardenlab.com/mcp"}'
 ```
 
 ### Cursor, Windsurf and other `mcp.json` clients
@@ -69,8 +69,8 @@ Add this entry to `~/.cursor/mcp.json` or to the client's MCP configuration:
 ```json
 {
   "mcpServers": {
-    "world-forest": { "url": "https://world.ghardenlab.com/mcp" },
-    "world-forest-docs": { "url": "https://world.ghardenlab.com/mcp/docs" }
+    "shared-forest": { "url": "https://world.ghardenlab.com/mcp" },
+    "shared-forest-docs": { "url": "https://world.ghardenlab.com/mcp/docs" }
   }
 }
 ```
@@ -117,24 +117,28 @@ Two zero-dependency clients with the same methods: `getForest`, `listTrees`, `pl
 
 | Directory | Language | Package name | Status |
 |---|---|---|---|
-| [sdk/js](sdk/js) | TypeScript and JavaScript (ESM, type declarations) | `world-forest-sdk` | Not published yet. Install from this repository. |
-| [sdk/python](sdk/python) | Python 3.9+ (`urllib` only) | `world-forest` | Not published yet. Install from this repository. |
+| [sdk/js](sdk/js) | TypeScript and JavaScript (ESM, type declarations) | `shared-forest-sdk` | Not published yet. Install from this repository. |
+| [sdk/python](sdk/python) | Python 3.9+ (`urllib` only) | `shared-forest` | Not published yet. Install from this repository. |
 
 ```sh
-pip install "git+https://github.com/ArneFfm/world-forest-agents#subdirectory=sdk/python"
+pip install "git+https://github.com/ArneFfm/shared-forest-agents#subdirectory=sdk/python"
 ```
+
+The product had the name World Forest before.
+Both SDKs export `WorldForestClient` and `WorldForestError` as aliases for old code.
+Old Python code can keep `import world_forest`.
 
 ## Install the skill
 
 ```sh
-npx skills add ArneFfm/world-forest-agents
+npx skills add ArneFfm/shared-forest-agents
 ```
 
-- [world-forest](skills/world-forest/SKILL.md): plant a tree or read the live forest over MCP or HTTP.
-- [world-forest-sponsor](skills/world-forest-sponsor/SKILL.md): sponsor custom trees for a user and hand over the confirm link.
+- [shared-forest](skills/shared-forest/SKILL.md): plant a tree or read the live forest over MCP or HTTP.
+- [shared-forest-sponsor](skills/shared-forest-sponsor/SKILL.md): sponsor custom trees for a user and hand over the confirm link.
 
 The skills follow the [Agent Skills](https://agentskills.io/specification) format.
-Each one is a verbatim copy of the live skill: [world-forest](https://world.ghardenlab.com/.well-known/agent-skills/world-forest/SKILL.md), [world-forest-sponsor](https://world.ghardenlab.com/.well-known/agent-skills/world-forest-sponsor/SKILL.md).
+Each one is a verbatim copy of the live skill: [shared-forest](https://world.ghardenlab.com/.well-known/agent-skills/shared-forest/SKILL.md), [shared-forest-sponsor](https://world.ghardenlab.com/.well-known/agent-skills/shared-forest-sponsor/SKILL.md).
 
 ## Plugin files
 
@@ -142,7 +146,7 @@ Each one is a verbatim copy of the live skill: [world-forest](https://world.ghar
 |---|---|
 | `plugin.json`, `mcp.json` | [Agent Plugins 1.0.0](https://agent-plugins.org/specification) |
 | `.codex-plugin/plugin.json`, `.mcp.json` | Codex plugin |
-| `server.json` | [MCP Registry](https://registry.modelcontextprotocol.io/) entry `io.github.ArneFfm/world-forest` |
+| `server.json` | [MCP Registry](https://registry.modelcontextprotocol.io/) entry `io.github.ArneFfm/shared-forest` |
 
 Load this directory with your client's local plugin mechanism.
 This repository does not install anything in a client by itself.
@@ -173,7 +177,7 @@ The check workflow holds the host once, in `ORIGIN`. It fails when a manifest na
    git grep -l world.ghardenlab.com | xargs sed -i '' 's#world\.ghardenlab\.com#NEW.DOMAIN#g'
    ```
 
-3. Copy the new live skills: `for s in world-forest world-forest-sponsor; do curl -sf https://NEW.DOMAIN/.well-known/agent-skills/$s/SKILL.md -o skills/$s/SKILL.md; done`.
+3. Copy the new live skills: `for s in shared-forest shared-forest-sponsor; do curl -sf https://NEW.DOMAIN/.well-known/agent-skills/$s/SKILL.md -o skills/$s/SKILL.md; done`.
 4. Increment `version` in `server.json`, then run `publish-mcp.yml`.
 5. Add `server-domain.json` and a domain-verified publish workflow, as in `ArneFfm/ecoaloha-agents`.
 

@@ -1,11 +1,11 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
-    "world-forest": {
+    "shared-forest": {
       "type": "streamable-http",
       "url": "https://world.ghardenlab.com/mcp"
     },
-    "world-forest-docs": {
+    "shared-forest-docs": {
       "type": "streamable-http",
       "url": "https://world.ghardenlab.com/mcp/docs"
     }

@@ -7,7 +7,7 @@ export interface Problem {
   detail: string;
 }
 
-export declare class WorldForestError extends Error {
+export declare class SharedForestError extends Error {
   readonly status: number;
   readonly problem: Problem | null;
   constructor(status: number, problem: Problem | null, message?: string);
@@ -103,7 +103,7 @@ export interface ClientOptions {
   userAgent?: string;
 }
 
-export declare class WorldForestClient {
+export declare class SharedForestClient {
   constructor(options?: ClientOptions);
   readonly baseUrl: string;
   request<T = unknown>(
@@ -129,3 +129,6 @@ export declare class WorldForestClient {
     options?: { intervalMs?: number; timeoutMs?: number; sleep?: (ms: number) => Promise<void> },
   ): Promise<Order>;
 }
+
+/** Names before the rename to Shared Forest. */
+export { SharedForestClient as WorldForestClient, SharedForestError as WorldForestError };

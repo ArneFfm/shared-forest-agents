@@ -1,11 +1,11 @@
-# World Forest integrations
+# Shared Forest integrations
 
-This repository holds the public agent plugin, skill and MCP registry metadata for World Forest.
+This repository holds the public agent plugin, skill and MCP registry metadata for Shared Forest.
 The server code lives in the private `ArneFfm/world-forest` repository.
 
 - Keep the manifests aligned with https://world.ghardenlab.com/openapi.json and the live MCP `tools/list`.
 - `skills/*/SKILL.md` are verbatim copies of the live skills. Change the server first, then copy them.
-- `sdk/js` (`world-forest-sdk`) and `sdk/python` (`world-forest`) stay zero-dependency and expose the same methods.
+- `sdk/js` (`shared-forest-sdk`) and `sdk/python` (`shared-forest`) stay zero-dependency and expose the same methods.
 - Start a sponsorship only when a user asks. Agents never confirm or pay for a consumer: they hand over `confirm_url`.
 - Do not add authentication. The API and MCP server are public and keyless.
 - Call `plant_tree` or `POST /api/visit {"plant": true}` only when a user asks. Tests use read-only tools.

@@ -1,13 +1,13 @@
-// World Forest SDK. Zero dependencies. Needs a global fetch (Node 18+, Deno, Bun, browsers, Workers).
+// Shared Forest SDK. Zero dependencies. Needs a global fetch (Node 18+, Deno, Bun, browsers, Workers).
 // Types: index.d.ts. API reference: https://world.ghardenlab.com/openapi.json
 
 export const DEFAULT_BASE_URL = "https://world.ghardenlab.com";
 
 /** An API error. `problem` holds the RFC 9457 problem+json body when the server sent one. */
-export class WorldForestError extends Error {
+export class SharedForestError extends Error {
   constructor(status, problem, message) {
-    super(message ?? problem?.detail ?? `World Forest API answered HTTP ${status}`);
-    this.name = "WorldForestError";
+    super(message ?? problem?.detail ?? `Shared Forest API answered HTTP ${status}`);
+    this.name = "SharedForestError";
     this.status = status;
     this.problem = problem ?? null;
   }
@@ -16,11 +16,11 @@ export class WorldForestError extends Error {
 const OPEN = "open";
 const PAID = "paid";
 
-export class WorldForestClient {
+export class SharedForestClient {
   constructor(options = {}) {
     this.baseUrl = (options.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
     this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
-    this.userAgent = options.userAgent ?? "world-forest-sdk-js/0.1.0";
+    this.userAgent = options.userAgent ?? "shared-forest-sdk-js/0.1.0";
   }
 
   async request(method, path, { query, body, idempotencyKey } = {}) {
@@ -37,7 +37,7 @@ export class WorldForestClient {
     } catch {
       data = null;
     }
-    if (!res.ok) throw new WorldForestError(res.status, data && typeof data === "object" ? data : null);
+    if (!res.ok) throw new SharedForestError(res.status, data && typeof data === "object" ? data : null);
     return data;
   }
 
@@ -81,7 +81,7 @@ export class WorldForestClient {
     if (spots?.length) {
       const held = await this.request("POST", "/api/v1/holds", { body: { spots }, idempotencyKey: `${idempotencyKey}:holds` });
       if (held.rejected?.length)
-        throw new WorldForestError(409, null, `Spots not free: ${held.rejected.map((r) => `(${r.x}, ${r.y}) ${r.reason}`).join("; ")}`);
+        throw new SharedForestError(409, null, `Spots not free: ${held.rejected.map((r) => `(${r.x}, ${r.y}) ${r.reason}`).join("; ")}`);
       holds = held.holds.map((h) => h.id);
     }
     try {
@@ -116,8 +116,11 @@ export class WorldForestClient {
     for (;;) {
       const order = await this.getOrder(orderId);
       if (order.status !== OPEN && order.status !== PAID) return order;
-      if (Date.now() + intervalMs > deadline) throw new WorldForestError(408, null, `Order ${orderId} is still ${order.status} after ${timeoutMs} ms.`);
+      if (Date.now() + intervalMs > deadline) throw new SharedForestError(408, null, `Order ${orderId} is still ${order.status} after ${timeoutMs} ms.`);
       await sleep(Math.max(intervalMs, 1000));
     }
   }
 }
+
+// Names before the rename to Shared Forest.
+export { SharedForestClient as WorldForestClient, SharedForestError as WorldForestError };

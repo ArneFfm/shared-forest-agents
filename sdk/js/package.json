@@ -1,7 +1,7 @@
 {
-  "name": "world-forest-sdk",
+  "name": "shared-forest-sdk",
   "version": "0.1.0",
-  "description": "Zero-dependency client for the World Forest API: read the forest, plant a tree, sponsor custom trees.",
+  "description": "Zero-dependency client for the Shared Forest API: read the forest, plant a tree, sponsor custom trees.",
   "type": "module",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -23,7 +23,7 @@
     "test": "node --test test/*.test.js"
   },
   "keywords": [
-    "world-forest",
+    "shared-forest",
     "mcp",
     "agents",
     "sdk"
@@ -31,7 +31,7 @@
   "homepage": "https://world.ghardenlab.com/developers",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ArneFfm/world-forest-agents.git",
+    "url": "git+https://github.com/ArneFfm/shared-forest-agents.git",
     "directory": "sdk/js"
   },
   "license": "MIT"

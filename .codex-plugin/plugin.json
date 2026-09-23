@@ -1,21 +1,21 @@
 {
-  "name": "world-forest",
-  "version": "1.1.0",
-  "description": "Plant a tree in the shared World Forest, read its live state, or sponsor custom trees for a user.",
+  "name": "shared-forest",
+  "version": "1.2.0",
+  "description": "Plant a tree in the Shared Forest, read its live state, or sponsor custom trees for a user.",
   "author": {
     "name": "Arne Kellmann"
   },
   "skills": "./skills/",
   "interface": {
-    "displayName": "World Forest",
+    "displayName": "Shared Forest",
     "shortDescription": "Plant a tree in a shared forest that grows from its traffic.",
-    "longDescription": "World Forest is a free, shared illustrated forest. Every visit adds growth energy. Every visitor, human or AI agent, can plant one tree per day. Agents can also quote, design and start a paid 12-month tree sponsorship; the user confirms and pays. The MCP server is public and needs no key.",
+    "longDescription": "Shared Forest is a free, shared illustrated forest. Every visit adds growth energy. Every visitor, human or AI agent, can plant one tree per day. Agents can also quote, design and start a paid 12-month tree sponsorship; the user confirms and pays. The MCP server is public and needs no key.",
     "developerName": "Arne Kellmann",
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": [
-      "Plant a tree in the World Forest.",
-      "Sponsor a tree in the World Forest with my name."
+      "Plant a tree in the Shared Forest.",
+      "Sponsor a tree in the Shared Forest with my name."
     ]
   },
   "mcpServers": "./.mcp.json",

@@ -20,28 +20,28 @@ jobs:
           pipx run check-jsonschema --schemafile https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json server.json
       - name: Check that every manifest points at ORIGIN
         run: |
-          test "$(jq -r '.mcpServers["world-forest"].url' mcp.json)" = "$ORIGIN/mcp"
-          test "$(jq -r '.mcpServers["world-forest"].url' .mcp.json)" = "$ORIGIN/mcp"
-          test "$(jq -r '.mcpServers["world-forest-docs"].url' mcp.json)" = "$ORIGIN/mcp/docs"
-          test "$(jq -r '.mcpServers["world-forest-docs"].url' .mcp.json)" = "$ORIGIN/mcp/docs"
+          test "$(jq -r '.mcpServers["shared-forest"].url' mcp.json)" = "$ORIGIN/mcp"
+          test "$(jq -r '.mcpServers["shared-forest"].url' .mcp.json)" = "$ORIGIN/mcp"
+          test "$(jq -r '.mcpServers["shared-forest-docs"].url' mcp.json)" = "$ORIGIN/mcp/docs"
+          test "$(jq -r '.mcpServers["shared-forest-docs"].url' .mcp.json)" = "$ORIGIN/mcp/docs"
           test "$(jq -r '.remotes[0].url' server.json)" = "$ORIGIN/mcp"
           if grep -rnoE 'https://[a-z0-9.-]+' --include='*.json' --include='*.md' . \
             | grep -vE "$ORIGIN|github.com|agent-plugins.org|modelcontextprotocol.io|agentskills.io|skills.sh|smithery.ai|chatgpt.com|claude.ai|cursor.com"; then
             echo "::error::Unknown host found. Update it or add it to the allow list."
             exit 1
           fi
-      - name: Check that the skill matches the live copy
-        run: curl -sSf "$ORIGIN/.well-known/agent-skills/world-forest/SKILL.md" | diff -u - skills/world-forest/SKILL.md
-      - name: Check that the sponsor skill matches the live copy (skipped until the site serves it)
+      - name: Check that the skills match the live copies (skipped until the site serves the Shared Forest names)
         run: |
-          url="$ORIGIN/.well-known/agent-skills/world-forest-sponsor/SKILL.md"
-          status=$(curl -s -o live-sponsor.md -w '%{http_code}' "$url")
-          if [ "$status" = 404 ]; then
-            echo "::notice::$url is not live yet. Comparison skipped."
-            exit 0
-          fi
-          test "$status" = 200
-          diff -u live-sponsor.md skills/world-forest-sponsor/SKILL.md
+          for skill in shared-forest shared-forest-sponsor; do
+            url="$ORIGIN/.well-known/agent-skills/$skill/SKILL.md"
+            status=$(curl -s -o live.md -w '%{http_code}' "$url")
+            if [ "$status" = 404 ]; then
+              echo "::notice::$url is not live yet. Comparison skipped."
+              continue
+            fi
+            test "$status" = 200
+            diff -u live.md "skills/$skill/SKILL.md"
+          done
   sdk:
     runs-on: ubuntu-latest
     steps:
@@ -64,10 +64,18 @@ jobs:
               -H 'MCP-Protocol-Version: 2025-06-18' \
               -d "$1"
           }
-          rpc '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"world-forest-agents-ci","version":"1"}}}' \
-            | jq -e '.result.serverInfo.name == "world-forest"'
+          rpc '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"shared-forest-agents-ci","version":"1"}}}' \
+            > init.json
+          # Until the site serves the Shared Forest names, accept the former names.
+          if jq -e '.result.serverInfo.name == "world-forest"' init.json >/dev/null; then
+            echo "::notice::The live MCP server still uses the former name world-forest."
+            explain=explain_world_forest
+          else
+            jq -e '.result.serverInfo.name == "shared-forest"' init.json
+            explain=explain_shared_forest
+          fi
           rpc '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
-            | jq -e '[.result.tools[].name] | contains(["get_forest_stats","get_forest","list_trees","plant_tree","explain_world_forest"])'
+            | jq -e --arg explain "$explain" '[.result.tools[].name] | contains(["get_forest_stats","get_forest","list_trees","plant_tree",$explain])'
           # Never call plant_tree here. It changes the live forest.
           rpc '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"get_forest_stats","arguments":{}}}' \
             | jq -e '.result.isError != true'

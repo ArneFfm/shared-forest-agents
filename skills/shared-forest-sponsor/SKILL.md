@@ -1,11 +1,11 @@
 ---
-name: world-forest-sponsor
-description: Sponsor custom-designed trees in World Forest for a user (12 months, name and optional link). Quote, design, place, start the order, hand the confirm link to the user.
+name: shared-forest-sponsor
+description: Sponsor custom-designed trees in Shared Forest for a user (12 months, name and optional link). Quote, design, place, start the order, hand the confirm link to the user.
 ---
 
-# Sponsor a tree in World Forest
+# Sponsor a tree in Shared Forest
 
-Use this skill when a user wants a lasting tree with their name, a gift tree, or a small branded grove in the shared World Forest.
+Use this skill when a user wants a lasting tree with their name, a gift tree, or a small branded grove in the Shared Forest.
 
 ## Sponsor trees via API or MCP
 

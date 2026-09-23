@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { WorldForestClient, WorldForestError } from "../index.js";
+import { SharedForestClient, SharedForestError, WorldForestClient, WorldForestError } from "../index.js";
 
 const ORDER = {
   id: "ord_test1", status: "open", quantity: 2, unitAmount: 900, total: 1800, currency: "eur", channel: "api",
@@ -18,7 +18,7 @@ function stub(routes) {
     if (!handler) return new Response(JSON.stringify({ type: "about:blank", title: "Not Found", status: 404, detail: "nope" }), { status: 404 });
     return handler(u, init);
   };
-  return { calls, client: new WorldForestClient({ baseUrl: "https://forest.example/", fetch }) };
+  return { calls, client: new SharedForestClient({ baseUrl: "https://forest.example/", fetch }) };
 }
 
 test("getForest and listTrees send query parameters to /api/v1/forest", async () => {
@@ -70,7 +70,7 @@ test("startSponsorship raises on rejected spots; API errors carry the problem", 
   const { client } = stub({ "POST /api/v1/holds": () => Response.json({ holds: [], rejected: [{ x: 1, y: 2, reason: "water" }] }) });
   await assert.rejects(
     client.startSponsorship({ quantity: 1, designIds: ["dsn_1"], spots: [{ x: 1, y: 2 }], displayName: "A", email: "a@b.co", idempotencyKey: "k" }),
-    (e) => e instanceof WorldForestError && e.status === 409 && /water/.test(e.message),
+    (e) => e instanceof SharedForestError && e.status === 409 && /water/.test(e.message),
   );
   const err = await client.getOrder("ord_missing").catch((e) => e);
   assert.equal(err.status, 404);
@@ -109,4 +109,9 @@ test("waitForOrder polls until the order leaves open and paid", async () => {
   assert.deepEqual(slept, [1000, 1000]);
   const { client: stuck } = stub({ "GET /api/v1/orders/ord_test1": () => Response.json(ORDER) });
   await assert.rejects(stuck.waitForOrder("ord_test1", { intervalMs: 5000, timeoutMs: 1, sleep: async () => {} }), (e) => e.status === 408);
+});
+
+test("the names before the rename stay exported", () => {
+  assert.equal(WorldForestClient, SharedForestClient);
+  assert.equal(WorldForestError, SharedForestError);
 });
