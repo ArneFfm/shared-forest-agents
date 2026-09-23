@@ -7,7 +7,7 @@ permissions:
   contents: read
 env:
   # The only place in this workflow that names the live host.
-  ORIGIN: https://world.ghardenlab.com
+  ORIGIN: https://sharedforest.com
 jobs:
   manifests:
     runs-on: ubuntu-latest

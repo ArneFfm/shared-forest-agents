@@ -13,8 +13,8 @@ license = "MIT"
 keywords = ["shared-forest", "mcp", "agents", "sdk"]
 
 [project.urls]
-Homepage = "https://world.ghardenlab.com/developers"
-Documentation = "https://world.ghardenlab.com/developers"
+Homepage = "https://sharedforest.com/developers"
+Documentation = "https://sharedforest.com/developers"
 Repository = "https://github.com/ArneFfm/shared-forest-agents"
 Issues = "https://github.com/ArneFfm/shared-forest-agents/issues"
 

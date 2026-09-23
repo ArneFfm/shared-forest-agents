@@ -9,7 +9,7 @@ Use this skill when a user wants a lasting tree with their name, a gift tree, or
 
 ## Sponsor trees via API or MCP
 
-A sponsorship puts 1-100 custom-designed trees in the forest for 12 months. Each tree shows a display name (1-32 characters) and an optional https link, labelled "Sponsored". The name goes live after automatic checks. The link goes live after a manual review. Prices include VAT. See [pricing](https://world.ghardenlab.com/pricing.md).
+A sponsorship puts 1-100 custom-designed trees in the forest for 12 months. Each tree shows a display name (1-32 characters) and an optional https link, labelled "Sponsored". The name goes live after automatic checks. The link goes live after a manual review. Prices include VAT. See [pricing](https://sharedforest.com/pricing.md).
 
 | Trees per order | Unit price | Renewal per tree | Discount | Example |
 |---|---|---|---|---|
@@ -24,14 +24,14 @@ Steps:
 1. Quote: MCP `get_price_quote` or `GET /api/v1/pricing/quote?quantity=5`.
 2. Design: MCP `design_tree` with a wish (1-200 characters) or `POST /api/v1/designs` `{"wish": "..."}`. Returns a `design_id` (`dsn_...`). Max 3 designs per caller per day. One design for all trees, or one per tree.
 3. Place (optional): MCP `find_spots` or `GET /api/v1/spots?quantity=5&near=4096,4096`. REST callers hold spots with `POST /api/v1/holds` and free unused ones with `DELETE /api/v1/holds/{id}`. Omit spots and the server picks free ones.
-4. Order: MCP `start_sponsorship` or `POST /api/v1/orders` with `channel: "mcp"` or `"api"` and an `Idempotency-Key`. The order is unpaid. It expires 30 minutes after creation unless the human confirms. `POST /api/v1/orders/{id}/extend` adds 30 minutes once; the confirm page does this when it opens. The response has `confirmUrl` (https://world.ghardenlab.com/sponsor/confirm/ord_...).
+4. Order: MCP `start_sponsorship` or `POST /api/v1/orders` with `channel: "mcp"` or `"api"` and an `Idempotency-Key`. The order is unpaid. It expires 30 minutes after creation unless the human confirms. `POST /api/v1/orders/{id}/extend` adds 30 minutes once; the confirm page does this when it opens. The response has `confirmUrl` (https://sharedforest.com/sponsor/confirm/ord_...).
 5. Hand over: give `confirmUrl` to your user. The user accepts the terms, gives the withdrawal consent and pays on Stripe. That page calls `POST /api/v1/orders/{id}/confirm`.
-6. Follow up: MCP `get_order` or `GET /api/v1/orders/{id}` every 10 seconds or more until `status` is `fulfilled`. `refund_pending` means paid but not plantable: the operator refunds. `treeIds` then lists the new trees. Share https://world.ghardenlab.com/?tree=<id>.
+6. Follow up: MCP `get_order` or `GET /api/v1/orders/{id}` every 10 seconds or more until `status` is `fulfilled`. `refund_pending` means paid but not plantable: the operator refunds. `treeIds` then lists the new trees. Share https://sharedforest.com/?tree=<id>.
 
 ```sh
-curl -s "https://world.ghardenlab.com/api/v1/pricing/quote?quantity=5"
-curl -s -X POST https://world.ghardenlab.com/api/v1/designs -H 'Content-Type: application/json' -d '{"wish":"a silver birch with warm lanterns"}'
-curl -s -X POST https://world.ghardenlab.com/api/v1/orders -H 'Content-Type: application/json' -H "Idempotency-Key: $(uuidgen)" \
+curl -s "https://sharedforest.com/api/v1/pricing/quote?quantity=5"
+curl -s -X POST https://sharedforest.com/api/v1/designs -H 'Content-Type: application/json' -d '{"wish":"a silver birch with warm lanterns"}'
+curl -s -X POST https://sharedforest.com/api/v1/orders -H 'Content-Type: application/json' -H "Idempotency-Key: $(uuidgen)" \
   -d '{"quantity":5,"designIds":["dsn_abc123"],"displayName":"Ada","email":"ada@example.com","channel":"api"}'
 ```
 
@@ -48,4 +48,4 @@ Errors are problem+json: `422` blocked name, link or wish; `409` spot taken or s
 - Confirm the display name, the link and the email with the user before start_sponsorship.
 - Never claim that the trees are bought or paid. Say "sponsored for 12 months".
 - Give the confirm_url to the user. Do not open it or fill it in for the user.
-- The MCP server is https://world.ghardenlab.com/mcp. No API key.
+- The MCP server is https://sharedforest.com/mcp. No API key.

@@ -1,7 +1,7 @@
 // Shared Forest SDK. Zero dependencies. Needs a global fetch (Node 18+, Deno, Bun, browsers, Workers).
-// Types: index.d.ts. API reference: https://world.ghardenlab.com/openapi.json
+// Types: index.d.ts. API reference: https://sharedforest.com/openapi.json
 
-export const DEFAULT_BASE_URL = "https://world.ghardenlab.com";
+export const DEFAULT_BASE_URL = "https://sharedforest.com";
 
 /** An API error. `problem` holds the RFC 9457 problem+json body when the server sent one. */
 export class SharedForestError extends Error {

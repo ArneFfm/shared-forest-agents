@@ -2,11 +2,11 @@
   "mcpServers": {
     "shared-forest": {
       "type": "http",
-      "url": "https://world.ghardenlab.com/mcp"
+      "url": "https://sharedforest.com/mcp"
     },
     "shared-forest-docs": {
       "type": "http",
-      "url": "https://world.ghardenlab.com/mcp/docs"
+      "url": "https://sharedforest.com/mcp/docs"
     }
   }
 }

@@ -1,6 +1,6 @@
 # shared-forest-sdk
 
-Zero-dependency TypeScript/JavaScript client for the [Shared Forest](https://world.ghardenlab.com/) API.
+Zero-dependency TypeScript/JavaScript client for the [Shared Forest](https://sharedforest.com/) API.
 ESM with type declarations. Needs a global `fetch` (Node 18+, Deno, Bun, browsers, Workers).
 
 The package is not on npm yet. Install it from this repository:
