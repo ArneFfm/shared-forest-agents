@@ -6,16 +6,22 @@ Shared Forest is a free, shared illustrated forest that grows from its traffic.
 Every page load adds growth energy to the trees.
 Every visitor, human or AI agent, can plant one tree per day.
 The server counts agent visits as agent traffic, and agent-planted trees carry `origin: "agent"`.
-There are no accounts and no API keys.
+Reading and planting need no account and no API key.
 The one paid product is a tree sponsorship: a custom-designed tree with a name and an optional link for 12 months.
-An agent can quote, design and start a sponsorship. The user confirms and pays on a link the agent hands over.
+An agent can quote and design without an account. To start a sponsorship, the user connects the agent to a free Shared Forest account with OAuth and sets a spending limit. The user confirms and pays on a link the agent hands over.
 
 Read the [developer portal](https://sharedforest.com/developers), the [agent guide](https://sharedforest.com/llms.txt) and the [OpenAPI description](https://sharedforest.com/openapi.json).
 
 ## Connect with MCP
 
 The remote MCP server is `https://sharedforest.com/mcp`.
-It uses stateless Streamable HTTP and needs no authentication.
+It uses stateless Streamable HTTP.
+The read tools, `plant_tree` and the sponsorship planning tools need no authentication.
+`start_sponsorship`, `get_order`, `my_orders` and `my_trees` act for a Shared Forest account and need an OAuth 2.1 access token.
+Without a token they answer HTTP 401 with `WWW-Authenticate: Bearer resource_metadata="https://sharedforest.com/.well-known/oauth-protected-resource/mcp"`.
+MCP clients then run the flow by themselves: Dynamic Client Registration, authorization code with PKCE (S256), refresh token rotation.
+The user logs in, checks the scopes and sets a spending limit (max EUR per order and per day).
+Walkthrough: [auth.md](https://sharedforest.com/auth.md).
 
 | Tool | Arguments | Effect |
 |---|---|---|
@@ -28,8 +34,10 @@ It uses stateless Streamable HTTP and needs no authentication.
 | `design_tree` | `wish` | Designs a custom tree from a wish. Returns `design_id`. 3 per caller per day. |
 | `get_design` | `design_id` | Read-only. One design and its genome. |
 | `find_spots` | `quantity`, `near_x`, `near_y` | Read-only. Free positions for N sponsored trees. |
-| `start_sponsorship` | `quantity`, `design_ids`, `spots`, `display_name`, `link`, `email`, `idempotency_key` | Creates an unpaid order. Returns `confirm_url` for the user and `next_step`. Charges nothing. |
-| `get_order` | `order_id` | Read-only. Order status and tree ids. |
+| `start_sponsorship` | `quantity`, `design_ids`, `spots`, `display_name`, `link`, `email`, `idempotency_key` | OAuth scope `sponsor:write`. Creates an unpaid order in the user's account, within the spending limit. Returns `confirm_url` for the user and `next_step`. Charges nothing. |
+| `get_order` | `order_id` | Read-only. OAuth scope `account:read` or `sponsor:write`. Status and tree ids of one of the user's orders. |
+| `my_orders` | `limit` | Read-only. OAuth scope `account:read`. The user's orders. |
+| `my_trees` | `limit` | Read-only. OAuth scope `account:read`. The user's sponsored trees with links. |
 
 The forest tools have optional arguments only. The sponsorship tools have required arguments; see the server card.
 A second server, `https://sharedforest.com/mcp/docs`, searches the documentation.
@@ -78,12 +86,14 @@ Add this entry to `~/.cursor/mcp.json` or to the client's MCP configuration:
 ### Claude.ai and Claude Desktop
 
 Open Settings, then Connectors, then "Add custom connector".
-Enter `https://sharedforest.com/mcp`. Leave the OAuth fields empty.
+Enter `https://sharedforest.com/mcp`. Leave the OAuth fields empty: Claude registers itself.
+When a tool needs your account, Claude opens the Shared Forest login and consent page.
 
 ### ChatGPT
 
 Enable developer mode in Settings, then Apps & Connectors, then Advanced settings.
-Create a connector with the URL `https://sharedforest.com/mcp` and the authentication "No authentication".
+Create a connector with the URL `https://sharedforest.com/mcp` and the authentication "OAuth".
+Choose "No authentication" if you only want to read the forest and plant trees.
 
 ## Use the HTTP API
 
