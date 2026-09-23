@@ -84,14 +84,30 @@ export class WorldForestClient {
         throw new WorldForestError(409, null, `Spots not free: ${held.rejected.map((r) => `(${r.x}, ${r.y}) ${r.reason}`).join("; ")}`);
       holds = held.holds.map((h) => h.id);
     }
-    return this.request("POST", "/api/v1/orders", {
-      body: { quantity, designIds, holdIds: holds, displayName, link, email, channel: "api" },
-      idempotencyKey,
-    });
+    try {
+      return await this.request("POST", "/api/v1/orders", {
+        body: { quantity, designIds, holdIds: holds, displayName, link, email, channel: "api" },
+        idempotencyKey,
+      });
+    } catch (error) {
+      // Free the spots this call held, so they do not count against the hold cap.
+      if (spots?.length) await Promise.allSettled(holds.map((id) => this.releaseHold(id)));
+      throw error;
+    }
   }
 
   getOrder(orderId) {
     return this.request("GET", `/api/v1/orders/${encodeURIComponent(orderId)}`);
+  }
+
+  /** An agent order expires 30 minutes after creation unless the human confirms. This adds 30 minutes, once. */
+  extendOrder(orderId) {
+    return this.request("POST", `/api/v1/orders/${encodeURIComponent(orderId)}/extend`);
+  }
+
+  /** Frees a held spot (the per-IP cap is 100 held spots). */
+  async releaseHold(holdId) {
+    await this.request("DELETE", `/api/v1/holds/${encodeURIComponent(holdId)}`);
   }
 
   /** Polls getOrder until the order leaves "open" and "paid", or the timeout passes. */

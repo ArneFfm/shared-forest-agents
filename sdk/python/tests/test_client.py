@@ -85,6 +85,26 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(ctx.exception.status, 404)
         self.assertEqual(ctx.exception.problem["detail"], "nope")
 
+    def test_extend_release_and_cleanup(self):
+        stub, c = client({
+            "POST /api/v1/orders/ord_test1/extend": lambda r: (200, ORDER),
+            "DELETE /api/v1/holds/hld_0": lambda r: (204, None),
+            "POST /api/v1/holds": lambda r: (201, {"holds": [{"id": "hld_0"}], "rejected": []}),
+            "POST /api/v1/orders": lambda r: (429, {"status": 429, "detail": "3 open orders per email"}),
+        })
+        self.assertEqual(c.extend_order("ord_test1")["id"], "ord_test1")
+        self.assertIsNone(c.release_hold("hld_0"))
+        with self.assertRaises(WorldForestError) as ctx:
+            c.start_sponsorship(1, ["dsn_1"], "A", "a@b.co", "k", spots=[{"x": 1, "y": 2}])
+        self.assertEqual(ctx.exception.status, 429)
+        self.assertEqual([call["method"] + " " + call["path"] for call in stub.calls], [
+            "POST /api/v1/orders/ord_test1/extend",
+            "DELETE /api/v1/holds/hld_0",
+            "POST /api/v1/holds",
+            "POST /api/v1/orders",
+            "DELETE /api/v1/holds/hld_0",
+        ])
+
     def test_wait_for_order(self):
         states = ["open", "paid", "fulfilled"]
         stub, c = client({"GET /api/v1/orders/ord_test1": lambda r: (200, dict(ORDER, status=states.pop(0)))})

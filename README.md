@@ -113,7 +113,7 @@ See the [pricing](https://world.ghardenlab.com/pricing.md) and the [OpenAPI desc
 
 ## Use the SDKs
 
-Two zero-dependency clients with the same methods: `getForest`, `listTrees`, `plant`, `quote`, `designTree`, `findSpots`, `startSponsorship`, `getOrder`, `waitForOrder`.
+Two zero-dependency clients with the same methods: `getForest`, `listTrees`, `plant`, `quote`, `designTree`, `findSpots`, `startSponsorship`, `getOrder`, `extendOrder`, `releaseHold`, `waitForOrder`.
 
 | Directory | Language | Package name | Status |
 |---|---|---|---|

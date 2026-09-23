@@ -113,10 +113,28 @@ class WorldForestClient:
             body["holdIds"] = holds
         if link:
             body["link"] = link
-        return self.request("POST", "/api/v1/orders", body=body, idempotency_key=idempotency_key)
+        try:
+            return self.request("POST", "/api/v1/orders", body=body, idempotency_key=idempotency_key)
+        except WorldForestError:
+            # Free the spots this call held, so they do not count against the hold cap.
+            if spots:
+                for hold_id in holds:
+                    try:
+                        self.release_hold(hold_id)
+                    except WorldForestError:
+                        pass
+            raise
 
     def get_order(self, order_id):
         return self.request("GET", "/api/v1/orders/" + urllib.parse.quote(order_id, safe=""))
+
+    def extend_order(self, order_id):
+        """An agent order expires 30 minutes after creation unless the human confirms. Adds 30 minutes, once."""
+        return self.request("POST", "/api/v1/orders/" + urllib.parse.quote(order_id, safe="") + "/extend")
+
+    def release_hold(self, hold_id):
+        """Frees a held spot (the per-IP cap is 100 held spots)."""
+        self.request("DELETE", "/api/v1/holds/" + urllib.parse.quote(hold_id, safe=""))
 
     def wait_for_order(self, order_id, interval=10.0, timeout=35 * 60, sleep=time.sleep):
         """Polls get_order until the order leaves "open" and "paid", or the timeout passes."""

@@ -27,7 +27,9 @@ print("Total %.2f EUR. Confirm and pay: %s" % (quote["total"] / 100, order["conf
 done = forest.wait_for_order(order["id"])
 ```
 
-Methods: `get_forest`, `list_trees`, `plant`, `quote`, `design_tree`, `find_spots`, `start_sponsorship`, `get_order`, `wait_for_order`.
+Methods: `get_forest`, `list_trees`, `plant`, `quote`, `design_tree`, `find_spots`, `start_sponsorship`, `get_order`, `extend_order`, `release_hold`, `wait_for_order`.
+
+An agent order expires 30 minutes after creation unless the human confirms. `extend_order` adds 30 minutes once.
 
 An agent cannot pay for a consumer: German consumer law needs the buyer's own confirmation.
 Errors raise `WorldForestError` with `status` and the problem+json body in `problem`.

@@ -64,7 +64,7 @@ export interface Spot {
   y: number;
 }
 
-export type OrderStatus = "open" | "paid" | "fulfilled" | "expired" | "refunded" | "disputed" | "cancelled";
+export type OrderStatus = "open" | "paid" | "fulfilled" | "expired" | "refunded" | "disputed" | "cancelled" | "refund_pending";
 
 export interface Order {
   id: string;
@@ -79,6 +79,8 @@ export interface Order {
   treeIds: string[];
   createdAt: number;
   paidAt: number | null;
+  /** Cents still to refund while status is "refund_pending". */
+  refundDue?: number | null;
 }
 
 export interface StartSponsorshipInput {
@@ -105,7 +107,7 @@ export declare class WorldForestClient {
   constructor(options?: ClientOptions);
   readonly baseUrl: string;
   request<T = unknown>(
-    method: "GET" | "POST",
+    method: "GET" | "POST" | "DELETE",
     path: string,
     options?: { query?: Record<string, unknown>; body?: unknown; idempotencyKey?: string },
   ): Promise<T>;
@@ -118,6 +120,10 @@ export declare class WorldForestClient {
   /** Creates an unpaid order. Give order.confirmUrl to the human buyer: only the buyer can confirm and pay. */
   startSponsorship(input: StartSponsorshipInput): Promise<Order>;
   getOrder(orderId: string): Promise<Order>;
+  /** An agent order expires 30 minutes after creation unless the human confirms. Adds 30 minutes, once. */
+  extendOrder(orderId: string): Promise<Order>;
+  /** Frees a held spot. */
+  releaseHold(holdId: string): Promise<void>;
   waitForOrder(
     orderId: string,
     options?: { intervalMs?: number; timeoutMs?: number; sleep?: (ms: number) => Promise<void> },

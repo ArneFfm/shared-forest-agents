@@ -77,6 +77,28 @@ test("startSponsorship raises on rejected spots; API errors carry the problem", 
   assert.equal(err.problem.detail, "nope");
 });
 
+test("extendOrder and releaseHold call the new endpoints; a failed order releases its holds", async () => {
+  const { calls, client } = stub({
+    "POST /api/v1/orders/ord_test1/extend": () => Response.json(ORDER),
+    "DELETE /api/v1/holds/hld_0": () => new Response(null, { status: 204 }),
+    "POST /api/v1/holds": () => Response.json({ holds: [{ id: "hld_0" }], rejected: [] }),
+    "POST /api/v1/orders": () => new Response(JSON.stringify({ status: 429, detail: "3 open orders per email" }), { status: 429 }),
+  });
+  assert.equal((await client.extendOrder("ord_test1")).id, "ord_test1");
+  assert.equal(await client.releaseHold("hld_0"), undefined);
+  await assert.rejects(
+    client.startSponsorship({ quantity: 1, designIds: ["dsn_1"], spots: [{ x: 1, y: 2 }], displayName: "A", email: "a@b.co", idempotencyKey: "k" }),
+    (e) => e.status === 429,
+  );
+  assert.deepEqual(calls.map((c) => `${c.method} ${c.path}`), [
+    "POST /api/v1/orders/ord_test1/extend",
+    "DELETE /api/v1/holds/hld_0",
+    "POST /api/v1/holds",
+    "POST /api/v1/orders",
+    "DELETE /api/v1/holds/hld_0",
+  ]);
+});
+
 test("waitForOrder polls until the order leaves open and paid", async () => {
   const states = ["open", "paid", "fulfilled"];
   const { calls, client } = stub({ "GET /api/v1/orders/ord_test1": () => Response.json({ ...ORDER, status: states.shift() }) });

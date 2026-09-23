@@ -46,9 +46,12 @@ const done = await forest.waitForOrder(order.id);
 | `findSpots(quantity, {near})` | `GET /api/v1/spots` |
 | `startSponsorship({...})` | `POST /api/v1/holds`, `POST /api/v1/orders` |
 | `getOrder(id)` | `GET /api/v1/orders/{id}` |
+| `extendOrder(id)` | `POST /api/v1/orders/{id}/extend` (30 more minutes, once) |
+| `releaseHold(id)` | `DELETE /api/v1/holds/{id}` |
 | `waitForOrder(id, {intervalMs, timeoutMs})` | polls `getOrder` |
 
 An agent cannot pay for a consumer: German consumer law needs the buyer's own confirmation.
+An agent order expires 30 minutes after creation unless the human confirms. `extendOrder` adds 30 minutes once.
 Errors throw `WorldForestError` with `status` and the problem+json body in `problem`.
 
 ## Test

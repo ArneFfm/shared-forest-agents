@@ -23,10 +23,10 @@ Steps:
 
 1. Quote: MCP `get_price_quote` or `GET /api/v1/pricing/quote?quantity=5`.
 2. Design: MCP `design_tree` with a wish (1-200 characters) or `POST /api/v1/designs` `{"wish": "..."}`. Returns a `design_id` (`dsn_...`). Max 3 designs per caller per day. One design for all trees, or one per tree.
-3. Place (optional): MCP `find_spots` or `GET /api/v1/spots?quantity=5&near=4096,4096`. REST callers hold spots with `POST /api/v1/holds`. Omit spots and the server picks free ones.
-4. Order: MCP `start_sponsorship` or `POST /api/v1/orders` with `channel: "mcp"` or `"api"` and an `Idempotency-Key`. The order is unpaid and holds the spots for 30 minutes. The response has `confirmUrl` (https://world.ghardenlab.com/sponsor/confirm/ord_...).
+3. Place (optional): MCP `find_spots` or `GET /api/v1/spots?quantity=5&near=4096,4096`. REST callers hold spots with `POST /api/v1/holds` and free unused ones with `DELETE /api/v1/holds/{id}`. Omit spots and the server picks free ones.
+4. Order: MCP `start_sponsorship` or `POST /api/v1/orders` with `channel: "mcp"` or `"api"` and an `Idempotency-Key`. The order is unpaid. It expires 30 minutes after creation unless the human confirms. `POST /api/v1/orders/{id}/extend` adds 30 minutes once; the confirm page does this when it opens. The response has `confirmUrl` (https://world.ghardenlab.com/sponsor/confirm/ord_...).
 5. Hand over: give `confirmUrl` to your user. The user accepts the terms, gives the withdrawal consent and pays on Stripe. That page calls `POST /api/v1/orders/{id}/confirm`.
-6. Follow up: MCP `get_order` or `GET /api/v1/orders/{id}` every 10 seconds or more until `status` is `fulfilled`. `treeIds` then lists the new trees. Share https://world.ghardenlab.com/?tree=<id>.
+6. Follow up: MCP `get_order` or `GET /api/v1/orders/{id}` every 10 seconds or more until `status` is `fulfilled`. `refund_pending` means paid but not plantable: the operator refunds. `treeIds` then lists the new trees. Share https://world.ghardenlab.com/?tree=<id>.
 
 ```sh
 curl -s "https://world.ghardenlab.com/api/v1/pricing/quote?quantity=5"
@@ -40,7 +40,7 @@ What an agent cannot do: accept the terms, give the withdrawal consent or pay fo
 
 Business buyers (phase 2, off until announced): `POST /api/v1/orders/{id}/pay` with the buyer's EU VAT id answers `402` with a Machine Payments Protocol challenge (`WWW-Authenticate: Payment`). Retry with a Stripe Shared Payment Token. This path is B2B only because the consumer rules above do not apply to businesses. It appears in the OpenAPI document only when it is on.
 
-Errors are problem+json: `422` blocked name, link or wish; `409` spot taken or sold out; `429` design quota; `503` sales not open yet.
+Errors are problem+json: `422` blocked name, link or wish; `409` spot taken or sold out; `429` rate limit or cap (3 designs per caller per day, 100 held spots per IP, 3 open orders per email, 300 unconfirmed spots in total); `502` payment provider down; `503` sales not open yet.
 
 ## Rules
 
