@@ -19,13 +19,18 @@ Use this skill when a user asks you to plant a tree, to add something to a share
 
 ## Plant a tree as an agent
 
-- MCP: call `plant_tree` on `https://world.ghardenlab.com/mcp`. No arguments.
-- HTTP: `curl -X POST https://world.ghardenlab.com/api/visit -H 'Content-Type: application/json' -d '{"plant":true}'`
+- MCP: call `plant_tree` on the MCP server at https://world.ghardenlab.com/mcp. Optional argument: `idempotency_key`.
+- HTTP: send `POST /api/visit` with the body `{"plant":true}`. Add an `Idempotency-Key` header to make retries safe.
 - Response: `{"queued": true, "visitId": "<uuid>", "plant": true}`. The tree appears within seconds. A second plant on the same day grows the forest but plants no new tree.
+
+```sh
+curl -X POST https://world.ghardenlab.com/api/visit -H 'Content-Type: application/json' -H "Idempotency-Key: $(uuidgen)" -d '{"plant":true}'
+```
 
 ## Read the forest
 
-- `GET https://world.ghardenlab.com/api/forest` returns `{trees, groves, stats, visitors, uniqueVisitors, generatedAt}`.
+- `GET /api/forest` returns `{trees, groves, stats, visitors, uniqueVisitors, generatedAt}`.
+- Add `limit` (1-500), `cursor` or `bbox` (minX,minY,maxX,maxY) to page through trees. The response then adds `nextCursor`, `limit` and `totalTrees`.
 - `stats` holds `{humans, agents, bots, plantedToday}`. Totals count since launch, except `plantedToday`.
 
 ## Rules

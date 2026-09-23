@@ -22,6 +22,8 @@ jobs:
         run: |
           test "$(jq -r '.mcpServers["world-forest"].url' mcp.json)" = "$ORIGIN/mcp"
           test "$(jq -r '.mcpServers["world-forest"].url' .mcp.json)" = "$ORIGIN/mcp"
+          test "$(jq -r '.mcpServers["world-forest-docs"].url' mcp.json)" = "$ORIGIN/mcp/docs"
+          test "$(jq -r '.mcpServers["world-forest-docs"].url' .mcp.json)" = "$ORIGIN/mcp/docs"
           test "$(jq -r '.remotes[0].url' server.json)" = "$ORIGIN/mcp"
           if grep -rnoE 'https://[a-z0-9.-]+' --include='*.json' --include='*.md' . \
             | grep -vE "$ORIGIN|github.com|agent-plugins.org|modelcontextprotocol.io|agentskills.io|skills.sh|smithery.ai|chatgpt.com|claude.ai|cursor.com"; then
@@ -36,7 +38,7 @@ jobs:
       - name: Initialize, list tools and call a read-only tool
         run: |
           rpc() {
-            curl -sSf -X POST "$ORIGIN/mcp" \
+            curl -sSf -X POST "$ORIGIN${2:-/mcp}" \
               -H 'Content-Type: application/json' \
               -H 'Accept: application/json, text/event-stream' \
               -H 'MCP-Protocol-Version: 2025-06-18' \
@@ -45,7 +47,9 @@ jobs:
           rpc '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"world-forest-agents-ci","version":"1"}}}' \
             | jq -e '.result.serverInfo.name == "world-forest"'
           rpc '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
-            | jq -e '[.result.tools[].name] | contains(["get_forest_stats","get_forest","plant_tree","explain_world_forest"])'
+            | jq -e '[.result.tools[].name] | contains(["get_forest_stats","get_forest","list_trees","plant_tree","explain_world_forest"])'
           # Never call plant_tree here. It changes the live forest.
           rpc '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"get_forest_stats","arguments":{}}}' \
             | jq -e '.result.isError != true'
+          rpc '{"jsonrpc":"2.0","id":4,"method":"tools/list"}' /mcp/docs \
+            | jq -e '[.result.tools[].name] | contains(["search_docs","read_doc"])'

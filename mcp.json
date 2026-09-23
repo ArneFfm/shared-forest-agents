@@ -4,6 +4,10 @@
     "world-forest": {
       "type": "streamable-http",
       "url": "https://world.ghardenlab.com/mcp"
+    },
+    "world-forest-docs": {
+      "type": "streamable-http",
+      "url": "https://world.ghardenlab.com/mcp/docs"
     }
   }
 }

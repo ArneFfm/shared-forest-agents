@@ -13,8 +13,10 @@
     "developerName": "Arne Kellmann",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": ["Plant a tree in the World Forest."]
+    "defaultPrompt": [
+      "Plant a tree in the World Forest."
+    ]
   },
   "mcpServers": "./.mcp.json",
-  "homepage": "https://world.ghardenlab.com/llms.txt"
+  "homepage": "https://world.ghardenlab.com/developers"
 }

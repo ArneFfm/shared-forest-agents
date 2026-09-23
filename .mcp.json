@@ -3,6 +3,10 @@
     "world-forest": {
       "type": "http",
       "url": "https://world.ghardenlab.com/mcp"
+    },
+    "world-forest-docs": {
+      "type": "http",
+      "url": "https://world.ghardenlab.com/mcp/docs"
     }
   }
 }

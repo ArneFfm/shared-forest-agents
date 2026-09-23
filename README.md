@@ -8,19 +8,24 @@ Every visitor, human or AI agent, can plant one tree per day.
 The server counts agent visits as agent traffic, and agent-planted trees carry `origin: "agent"`.
 There are no accounts, no API keys and no payments.
 
-Read the [agent guide](https://world.ghardenlab.com/llms.txt) and the [OpenAPI description](https://world.ghardenlab.com/openapi.json).
+Read the [developer portal](https://world.ghardenlab.com/developers), the [agent guide](https://world.ghardenlab.com/llms.txt) and the [OpenAPI description](https://world.ghardenlab.com/openapi.json).
 
 ## Connect with MCP
 
 The remote MCP server is `https://world.ghardenlab.com/mcp`.
 It uses stateless Streamable HTTP and needs no authentication.
 
-| Tool | Effect |
-|---|---|
-| `get_forest_stats` | Read-only. Counts of trees, groves, visitors and traffic by class. |
-| `get_forest` | Read-only. Tree counts by type, stage and origin, grove levels, newest trees. |
-| `plant_tree` | Plants one tree for the caller. One tree per visitor per day. |
-| `explain_world_forest` | Read-only. Returns the full agent guide as Markdown. |
+| Tool | Arguments | Effect |
+|---|---|---|
+| `get_forest_stats` | `fields` | Read-only. Counts of trees, groves, visitors and traffic by class. |
+| `get_forest` | `limit`, `bbox` | Read-only. Tree counts by type, stage and origin, grove levels, newest trees. |
+| `list_trees` | `limit`, `cursor`, `bbox` | Read-only. One page of trees. Pass `nextCursor` as `cursor` until it is null. |
+| `plant_tree` | `idempotency_key` | Plants one tree for the caller. One tree per visitor per day. |
+| `explain_world_forest` | `section` | Read-only. Returns the agent guide as Markdown. |
+
+All arguments are optional.
+A second server, `https://world.ghardenlab.com/mcp/docs`, searches the documentation.
+Its read-only tools are `search_docs` (`query`, `limit`) and `read_doc` (`id`).
 
 The [server card](https://world.ghardenlab.com/.well-known/mcp/server-card.json) lists the same tools.
 
@@ -28,6 +33,7 @@ The [server card](https://world.ghardenlab.com/.well-known/mcp/server-card.json)
 
 ```sh
 claude mcp add --transport http world-forest https://world.ghardenlab.com/mcp
+claude mcp add --transport http world-forest-docs https://world.ghardenlab.com/mcp/docs
 ```
 
 ### Codex CLI
@@ -55,7 +61,8 @@ Add this entry to `~/.cursor/mcp.json` or to the client's MCP configuration:
 ```json
 {
   "mcpServers": {
-    "world-forest": { "url": "https://world.ghardenlab.com/mcp" }
+    "world-forest": { "url": "https://world.ghardenlab.com/mcp" },
+    "world-forest-docs": { "url": "https://world.ghardenlab.com/mcp/docs" }
   }
 }
 ```
@@ -76,13 +83,22 @@ Create a connector with the URL `https://world.ghardenlab.com/mcp` and the authe
 # Read the live forest. Cached 30 s. CORS *.
 curl https://world.ghardenlab.com/api/forest
 
+# Page through trees. Pass nextCursor as cursor until it is null.
+curl 'https://world.ghardenlab.com/api/forest?limit=100'
+
+# Ask a question in natural language.
+curl 'https://world.ghardenlab.com/ask?query=how+do+trees+grow'
+
 # Plant a tree. Do this only when the user asks for it.
 curl -X POST https://world.ghardenlab.com/api/visit \
-  -H 'Content-Type: application/json' -d '{"plant":true}'
+  -H 'Content-Type: application/json' \
+  -H "Idempotency-Key: $(uuidgen)" -d '{"plant":true}'
 ```
 
 The visit response is `{"queued": true, "visitId": "<uuid>", "plant": true}`.
 The tree appears on the live canvas within seconds.
+Reuse the same `Idempotency-Key` to retry a plant safely.
+`/api/v1/forest` and `/api/v1/visit` are versioned aliases. Responses carry the `API-Version` header.
 
 ## Install the skill
 
