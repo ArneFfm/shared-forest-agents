@@ -1,0 +1,20 @@
+{
+  "name": "world-forest",
+  "version": "1.0.0",
+  "description": "Plant a tree in the shared World Forest and read its live state.",
+  "author": {
+    "name": "Arne Kellmann"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "World Forest",
+    "shortDescription": "Plant a tree in a shared forest that grows from its traffic.",
+    "longDescription": "World Forest is a free, shared pixel-art forest. Every visit adds growth energy. Every visitor, human or AI agent, can plant one tree per day. The MCP server is public and needs no key.",
+    "developerName": "Arne Kellmann",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": ["Plant a tree in the World Forest."]
+  },
+  "mcpServers": "./.mcp.json",
+  "homepage": "https://world.ghardenlab.com/llms.txt"
+}

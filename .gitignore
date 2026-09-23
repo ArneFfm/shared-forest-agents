@@ -1,0 +1,4 @@
+.env*
+.mcpregistry*
+mcp-publisher
+publisher.tar.gz

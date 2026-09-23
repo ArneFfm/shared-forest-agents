@@ -1,0 +1,51 @@
+name: Check integrations
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  # The only place in this workflow that names the live host.
+  ORIGIN: https://world.ghardenlab.com
+jobs:
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Validate manifests against their JSON schemas
+        run: |
+          pipx run check-jsonschema --schemafile https://agent-plugins.org/schemas/1.0.0/plugin.schema.json plugin.json
+          pipx run check-jsonschema --schemafile https://agent-plugins.org/schemas/1.0.0/mcp.schema.json mcp.json
+          pipx run check-jsonschema --schemafile https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json server.json
+      - name: Check that every manifest points at ORIGIN
+        run: |
+          test "$(jq -r '.mcpServers["world-forest"].url' mcp.json)" = "$ORIGIN/mcp"
+          test "$(jq -r '.mcpServers["world-forest"].url' .mcp.json)" = "$ORIGIN/mcp"
+          test "$(jq -r '.remotes[0].url' server.json)" = "$ORIGIN/mcp"
+          if grep -rnoE 'https://[a-z0-9.-]+' --include='*.json' --include='*.md' . \
+            | grep -vE "$ORIGIN|github.com|agent-plugins.org|modelcontextprotocol.io|agentskills.io|skills.sh|smithery.ai|chatgpt.com|claude.ai|cursor.com"; then
+            echo "::error::Unknown host found. Update it or add it to the allow list."
+            exit 1
+          fi
+      - name: Check that the skill matches the live copy
+        run: curl -sSf "$ORIGIN/.well-known/agent-skills/world-forest/SKILL.md" | diff -u - skills/world-forest/SKILL.md
+  mcp-handshake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Initialize, list tools and call a read-only tool
+        run: |
+          rpc() {
+            curl -sSf -X POST "$ORIGIN/mcp" \
+              -H 'Content-Type: application/json' \
+              -H 'Accept: application/json, text/event-stream' \
+              -H 'MCP-Protocol-Version: 2025-06-18' \
+              -d "$1"
+          }
+          rpc '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"world-forest-agents-ci","version":"1"}}}' \
+            | jq -e '.result.serverInfo.name == "world-forest"'
+          rpc '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+            | jq -e '[.result.tools[].name] | contains(["get_forest_stats","get_forest","plant_tree","explain_world_forest"])'
+          # Never call plant_tree here. It changes the live forest.
+          rpc '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"get_forest_stats","arguments":{}}}' \
+            | jq -e '.result.isError != true'
