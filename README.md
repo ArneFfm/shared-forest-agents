@@ -7,7 +7,7 @@ Every page load adds growth energy to the trees.
 Every visitor, human or AI agent, can plant one tree per day.
 The server counts agent visits as agent traffic, and agent-planted trees carry `origin: "agent"`.
 Reading and planting need no account and no API key.
-The one paid product is a tree sponsorship: a custom-designed tree with a name and an optional link for 12 months.
+The one paid product is a tree sponsorship: a premium, AI-painted tree (the buyer picks one of up to four variants) with a name and an optional link for 12 months.
 An agent can quote and design without an account. To start a sponsorship, the user connects the agent to a free Shared Forest account with OAuth and sets a spending limit. The user confirms and pays on a link the agent hands over.
 
 Read the [developer portal](https://sharedforest.com/developers), the [agent guide](https://sharedforest.com/llms.txt) and the [OpenAPI description](https://sharedforest.com/openapi.json).
