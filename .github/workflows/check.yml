@@ -10,7 +10,7 @@ env:
   ORIGIN: https://sharedforest.com
 jobs:
   manifests:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Validate manifests against their JSON schemas
@@ -43,9 +43,12 @@ jobs:
             diff -u live.md "skills/$skill/SKILL.md"
           done
   sdk:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
       - name: Test the JavaScript SDK
         working-directory: sdk/js
         run: npm test
@@ -53,7 +56,7 @@ jobs:
         working-directory: sdk/python
         run: python3 -m unittest discover -s tests
   mcp-handshake:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     steps:
       - name: Initialize, list tools and call a read-only tool
         run: |

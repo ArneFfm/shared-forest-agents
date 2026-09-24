@@ -17,7 +17,7 @@ jobs:
   build:
     # Release tags for this package: sdk-py-v<version>, for example sdk-py-v0.1.0.
     if: (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'sdk-py-v')) || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     defaults:
       run:
         working-directory: sdk/python
@@ -47,7 +47,7 @@ jobs:
   publish:
     needs: build
     if: github.event_name == 'release' || !inputs.dry_run
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     environment: pypi
     permissions:
       id-token: write
