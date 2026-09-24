@@ -1,6 +1,6 @@
 ---
 name: shared-forest-sponsor
-description: Sponsor custom-designed trees in Shared Forest for a user (12 months, name and optional link). Quote, design, place, start the order, hand the confirm link to the user.
+description: Sponsor premium, AI-painted trees in Shared Forest for a user (12 months, name and optional link). Quote, design, place, start the order, hand the confirm link to the user.
 ---
 
 # Sponsor a tree in Shared Forest
@@ -9,7 +9,7 @@ Use this skill when a user wants a lasting tree with their name, a gift tree, or
 
 ## Sponsor trees via API or MCP
 
-A sponsorship puts 1-100 custom-designed trees in the forest for 12 months. Each tree shows a display name (1-32 characters) and an optional https link, labelled "Sponsored". The name goes live after automatic checks. The link goes live after a manual review. Prices include VAT. See [pricing](https://sharedforest.com/pricing.md).
+A sponsorship puts 1-100 premium trees in the forest for 12 months. An AI paints each design from the wish; the trees stand full grown from the first day. Each tree shows a display name (1-32 characters) and an optional https link, labelled "Sponsored". The name goes live after automatic checks. The link goes live after a manual review. Prices include VAT. See [pricing](https://sharedforest.com/pricing.md).
 
 | Trees per order | Unit price | Renewal per tree | Discount | Example |
 |---|---|---|---|---|
