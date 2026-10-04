@@ -16,6 +16,7 @@ Read the [developer portal](https://sharedforest.com/developers), the [agent gui
 
 The remote MCP server is `https://sharedforest.com/mcp`.
 It uses stateless Streamable HTTP.
+It supports MCP `2026-07-28` with per-request protocol metadata and matching HTTP headers; legacy clients can still initialize.
 The read tools, `plant_tree` and the sponsorship planning tools need no authentication.
 `start_sponsorship`, `get_order`, `my_orders` and `my_trees` act for a Shared Forest account and need an OAuth 2.1 access token.
 Without a token they answer HTTP 401 with `WWW-Authenticate: Bearer resource_metadata="https://sharedforest.com/.well-known/oauth-protected-resource/mcp"`.
@@ -42,6 +43,10 @@ Walkthrough: [auth.md](https://sharedforest.com/auth.md).
 The forest tools have optional arguments only. The sponsorship tools have required arguments; see the server card.
 A second server, `https://sharedforest.com/mcp/docs`, searches the documentation.
 Its read-only tools are `search_docs` (`query`, `limit`) and `read_doc` (`id`).
+
+With OAuth scope `account:read`, an enabled callback relay can expose `sponsorship.order.updated` and `sponsorship.tree.updated` on the same `/mcp` endpoint. These events report changes to your own orders or sponsored trees. Optional filters are `order_id` and, for tree events, `tree_id`. Check authenticated `server/discover` for availability. Anonymous calls, public server cards and the docs server do not expose Events.
+
+Webhook subscriptions expire after at most 24 hours. Refresh before `refreshBefore`, or unsubscribe with the original event name, arguments and callback URL. Events have no protocol replay. An updated registry document does not rescan an installed ChatGPT plugin or prove a native host subscription.
 
 The [server card](https://sharedforest.com/.well-known/mcp/server-card.json) lists the same tools.
 
@@ -157,6 +162,8 @@ Each one is a verbatim copy of the live skill: [shared-forest](https://sharedfor
 | `plugin.json`, `mcp.json` | [Agent Plugins 1.0.0](https://agent-plugins.org/specification) |
 | `.codex-plugin/plugin.json`, `.mcp.json` | Codex plugin |
 | `server.json` | [MCP Registry](https://registry.modelcontextprotocol.io/) entry `io.github.ArneFfm/shared-forest` |
+
+Registry revision `1.5.0`, plugin version `1.2.0` and server software version `1.0.0` describe separate artifacts.
 
 Load this directory with your client's local plugin mechanism.
 This repository does not install anything in a client by itself.

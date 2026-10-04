@@ -9,23 +9,23 @@ Use this skill when a user wants a lasting tree with their name, a gift tree, or
 
 ## Sponsor trees via API or MCP
 
-A sponsorship puts 1-100 premium trees in the forest for 12 months. An AI paints each design from the wish; the trees stand full grown from the first day. Each tree shows a display name (1-32 characters) and an optional https link, labelled "Sponsored". The name goes live after automatic checks. The link goes live after a manual review. Prices include VAT. See [pricing](https://sharedforest.com/pricing.md).
+A sponsorship puts 1-100 premium trees in the forest for 12 months. Choose one-time payment, which ends after 12 months, or an annual subscription at about 20 % less with a 12-month minimum term. After the first year, the buyer can cancel at any time and get a day-based refund of unused prepaid time. An AI paints each design from the wish; the trees stand full grown from the first day. Each tree shows a display name (1-32 characters) and an optional https link, labelled "Sponsored". The name goes live after automatic checks. The link goes live after a manual review. Prices are final; any applicable tax is included. See [pricing](https://sharedforest.com/pricing.md).
 
-| Trees per order | Unit price | Renewal per tree | Discount | Example |
-|---|---|---|---|---|
-| 1-4 | 9.00 EUR | 4.50 EUR | 0 % | 1 tree = 9.00 EUR |
-| 5-9 | 7.80 EUR | 3.90 EUR | 13 % | 5 trees = 39.00 EUR |
-| 10-24 | 6.90 EUR | 3.45 EUR | 23 % | 10 trees = 69.00 EUR |
-| 25-99 | 5.96 EUR | 2.98 EUR | 34 % | 25 trees = 149.00 EUR |
-| 100 | 4.90 EUR | 2.45 EUR | 46 % | 100 trees = 490.00 EUR |
+| Trees per order | One-time per tree | Annual plan per tree | Example final price |
+|---|---|---|---|
+| 1-4 | 9.00 EUR | 7.20 EUR/year | 1 tree: 9.00 EUR once or 7.20 EUR/year |
+| 5-9 | 7.80 EUR | 6.24 EUR/year | 5 trees: 39.00 EUR once or 31.20 EUR/year |
+| 10-24 | 6.90 EUR | 5.52 EUR/year | 10 trees: 69.00 EUR once or 55.20 EUR/year |
+| 25-99 | 5.96 EUR | 4.77 EUR/year | 25 trees: 149.00 EUR once or 119.25 EUR/year |
+| 100 | 4.90 EUR | 3.92 EUR/year | 100 trees: 490.00 EUR once or 392.00 EUR/year |
 
 Steps:
 
-1. Quote: MCP `get_price_quote` or `GET /api/v1/pricing/quote?quantity=5`.
+1. Quote: MCP `get_price_quote` or `GET /api/v1/pricing/quote?quantity=5&billingChoice=one_time`. The public REST price quote also accepts `billingChoice=subscription`. Agents can prepare only one-time orders; the buyer starts an annual subscription on the website.
 2. Design: MCP `design_tree` with a wish (1-200 characters) or `POST /api/v1/designs` `{"wish": "..."}`. Returns a `design_id` (`dsn_...`). Max 3 designs per caller per day. One design for all trees, or one per tree.
 3. Place (optional): MCP `find_spots` or `GET /api/v1/spots?quantity=5&near=4096,4096`. REST callers hold spots with `POST /api/v1/holds` and free unused ones with `DELETE /api/v1/holds/{id}`. Omit spots and the server picks free ones.
-4. Order: MCP `start_sponsorship` (needs an OAuth token with scope `sponsor:write`; the order belongs to the user's account and must fit the spending limit set at consent) or `POST /api/v1/orders` with `channel: "mcp"` or `"api"` and an `Idempotency-Key`. The order is unpaid. It expires 30 minutes after creation unless the human confirms. `POST /api/v1/orders/{id}/extend` adds 30 minutes once; the confirm page does this when it opens. The response has `confirmUrl` (https://sharedforest.com/sponsor/confirm/ord_...).
-5. Hand over: give `confirmUrl` to your user. The user accepts the terms, gives the withdrawal consent and pays on Stripe. That page calls `POST /api/v1/orders/{id}/confirm`.
+4. Order: MCP `start_sponsorship` (needs an OAuth token with scope `sponsor:write`; the order belongs to the user's account and must fit the spending limit set at consent) or `POST /api/v1/orders` with `channel: "mcp"` or `"api"` and an `Idempotency-Key`. Agent orders are one-time. The order is unpaid. It expires 30 minutes after creation unless the human confirms. `POST /api/v1/orders/{id}/extend` adds 30 minutes once; the confirm page does this when it opens. The response has `confirmUrl` (https://sharedforest.com/sponsor/confirm/ord_...).
+5. Hand over: give `confirmUrl` to your user. The user checks the one-time payment, accepts the terms, gives the withdrawal consent and pays on Stripe. That page calls `POST /api/v1/orders/{id}/confirm`.
 6. Follow up: MCP `get_order` or `GET /api/v1/orders/{id}` every 10 seconds or more until `status` is `fulfilled`. `refund_pending` means paid but not plantable: the operator refunds. `treeIds` then lists the new trees. Share https://sharedforest.com/?tree=<id>.
 
 ```sh
@@ -36,7 +36,7 @@ curl -s -X POST https://sharedforest.com/api/v1/orders -H 'Content-Type: applica
 ```
 
 What an agent can do: quote, design, select spots, create an unpaid order, read its status.
-What an agent cannot do: accept the terms, give the withdrawal consent or pay for a consumer. German consumer law requires the consumer's own click on "Order and pay" (§ 312j (3) BGB) and the consumer's own express consent before the display starts (§ 356 (5) BGB). So a human always confirms on `confirmUrl`.
+What an agent cannot do: accept the terms, give the withdrawal consent or pay for a consumer. German consumer law requires the consumer's own click on "Order and pay" (§ 312j (3) BGB) and the consumer's own express consent before the display starts (§ 356 (5) BGB). The right of withdrawal ends only after full performance, not when the display starts. A human always confirms on `confirmUrl`.
 
 Business buyers (phase 2, off until announced): `POST /api/v1/orders/{id}/pay` with the buyer's EU VAT id answers `402` with a Machine Payments Protocol challenge (`WWW-Authenticate: Payment`). Retry with a Stripe Shared Payment Token. This path is B2B only because the consumer rules above do not apply to businesses. It appears in the OpenAPI document only when it is on.
 
@@ -44,7 +44,7 @@ Errors are problem+json: `422` blocked name, link or wish; `409` spot taken or s
 
 ## Rules
 
-- Tell the user the total from get_price_quote before you start an order.
+- Tell the user the one-time total from get_price_quote before you start an agent order. For an annual subscription, send the buyer to the website.
 - Confirm the display name, the link and the email with the user before start_sponsorship.
 - Never claim that the trees are bought or paid. Say "sponsored for 12 months".
 - Give the confirm_url to the user. Do not open it or fill it in for the user.
